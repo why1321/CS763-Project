@@ -24,9 +24,11 @@ jobs:
           unzip sonar-scanner.zip -d $HOME
           export PATH="$HOME/sonar-scanner-4.6.2.2472-linux/bin:$PATH"
       - name: Run SonarQube Scanner
+        
+      - name: Run SonarQube Scanner
         run: |
           sonar-scanner \
             -Dsonar.projectKey=MyDietHub \
             -Dsonar.sources=. \
             -Dsonar.host.url=http://localhost:9000 \
-            -Dsonar.login=<your-sonarqube-token>
+            -Dsonar.login=
