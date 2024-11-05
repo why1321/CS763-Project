@@ -12,6 +12,8 @@ jobs:
   dependency-check:
     runs-on: ubuntu-latest
     steps:
+      - name: Create Reports Directory
+        run: mkdir -p reports
       - uses: actions/checkout@v2
       - name: Install Dependency-Check
         run: |
