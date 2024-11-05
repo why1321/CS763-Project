@@ -19,7 +19,7 @@ jobs:
           unzip dependency-check-8.3.1-release.zip -d $HOME
       - name: Run Dependency-Check
         run: |
-          $HOME/dependency-check/bin/dependency-check.sh --project MyDietHub --scan . --format "ALL" --out reports
+          $HOME/dependency-check/bin/dependency-check.sh --project CS763-Project --scan . --format "ALL" --out reports
       - name: Upload Dependency-Check Report
         uses: actions/upload-artifact@v3
         with:
