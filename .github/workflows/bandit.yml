@@ -19,5 +19,5 @@ jobs:
           python-version: '3.x'
       - name: Install Bandit
         run: pip install bandit
-      - name: Run Bandit
-        run: bandit -r CS763-Project/BUMETCS673OLSum21P4/app.py
+      - name: Run Bandit Security Scan
+        run: bandit -r
