@@ -20,4 +20,4 @@ jobs:
       - name: Install Bandit
         run: pip install bandit
       - name: Run Bandit
-        run: bandit -r app/
+        run: bandit -r CS763-Project/BUMETCS673OLSum21P4/app/
