@@ -9,7 +9,7 @@ from statistics import fmean, StatisticsError
 def load_cfg():
     projroot = here()
     with open(projroot / "user_config.yml", "r") as ymlfile:
-        cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+        cfg = yaml.safe_load(ymlfile)
     return cfg
 
 
@@ -23,7 +23,7 @@ def usda_api_call(search_term: str, cfg: dict):
     api_str = 'https://api.nal.usda.gov/fdc/v1/foods/search?query={}&pageSize=2&api_key={}'\
         .format(quote(search_term.lower()), api_key)
 
-    response = requests.get(api_str)
+    response = requests.get(api_str, timeout=5)
     json_data = json.loads(response.text)
 
     return json_data

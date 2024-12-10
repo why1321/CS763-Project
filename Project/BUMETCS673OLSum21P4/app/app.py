@@ -1,9 +1,12 @@
 from flask import Flask, jsonify, abort
 from flask_login import login_required, current_user, logout_user, login_user
 from webargs.flaskparser import parser
-from Crypto.Cipher import AES
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+import os
 import base64
-from Crypto.Random import get_random_bytes
 from models import *
 from flask_wtf.csrf import CSRFProtect
 
@@ -14,7 +17,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # CORS(app)
 
-app.secret_key = 'xf7\xc4\xfa\x91'
+app.secret_key = os.getenv("APP_SECRET_KEY", "fallback_key")
 
 # config the SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../database/data.db'
@@ -102,21 +105,18 @@ def login():
     return render_template('login.html', msg=msg)
 
 def encrypt_data(data, key):
-    cipher = AES.new(key, AES.MODE_EAX)
-    ciphertext, tag = cipher.encrypt_and_digest(data.encode('utf-8'))
-    return base64.b64encode(cipher.nonce + tag + ciphertext).decode('utf-8')
-
+    astc = AESGCM(key)
+    nonce = os.urandom(12)  # 12 bytes nonce for AESGCM
+    ciphertext = astc.encrypt(nonce, data.encode('utf-8'), None)
+    return base64.b64encode(nonce + ciphertext).decode('utf-8')
 
 def decrypt_data(encrypted_data, key):
+    astc = AESGCM(key)
     decoded_data = base64.b64decode(encrypted_data)
-    nonce = decoded_data[:16]
-    tag = decoded_data[16:32]
-    ciphertext = decoded_data[32:]
-    cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
-    data = cipher.decrypt_and_verify(ciphertext, tag)
+    nonce = decoded_data[:12]
+    ciphertext = decoded_data[12:]
+    data = astc.decrypt(nonce, ciphertext, None)
     return data.decode('utf-8')
-
-
 reg_args = {
     "firstname":
         fields.Str(
@@ -389,4 +389,5 @@ def update_meal(id):
         return render_template('update.html', meal=meal)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    debug_mode = os.getenv("FLASK_DEBUG", "False").lower() == "true"
+    app.run(debug=debug_mode)

@@ -21,6 +21,7 @@ class UserModel(UserMixin, db.Model):
     role = db.Column(db.String(20))
 
     def __init__(self, firstname='', lastname='', email='', username='', password='', role=''):
+
         self.firstname = firstname
         self.lastname = lastname
         self.email = email
